@@ -6,4 +6,3 @@ def index(request):
     return render(request, 'app_news/main.html')
 
 
-#TODO: 
