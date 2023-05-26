@@ -1,15 +1,26 @@
+from typing import Any, Optional
 from django.db import models
 from ckeditor.fields import RichTextField
 import os
+from django.utils import timezone
+
 
 
 # Create your models here.
 
-#TODO: Create Autohor model With fields: name, surname, age, email, phone, description
-#TODO: Posts model with fields: title, description, created_at, updated_at, author(FK)
-#TODO: Create Database for users login and register
+
 
 def author_image_path(instance, filename):
+    """
+    Returns a string representing the path where the image file should be saved for an Author instance.
+
+    Args:
+        instance: An instance of the Author model.
+        filename: A string representing the original filename of the image file.
+
+    Returns:
+        A string representing the path where the image file should be saved.
+    """
     # Get the file extension from the original filename
     file_extension = filename.split('.')[-1]
     # Use the author's id as the new filename
@@ -17,6 +28,23 @@ def author_image_path(instance, filename):
     return f'authors/images/{name}.{file_extension}' 
 
 class Author(models.Model):
+    """
+    Represents an author in the system.
+
+    Fields:
+        id: An auto-incrementing integer field that serves as the primary key for the model.
+        name: A character field that stores the author's first name.
+        surname: A character field that stores the author's last name.
+        company_name: A character field that stores the name of the author's company.
+        email: An email field that stores the author's email address.
+        image: An image field that stores the author's profile picture. The `upload_to` argument specifies the path where the image file should be saved, and the `default` argument specifies the default image to use if no image is provided.
+
+    Methods:
+        __str__: Returns a string representation of the author, which is the concatenation of the author's first and last name.
+        save: Overrides the default `save` method to update the image path with the author's id if the image name is None.
+        delete: Overrides the default `delete` method to delete the image file associated with the author instance.
+    """
+    user = models.OneToOneField('auth.User', on_delete=models.CASCADE, blank=True, null=True)
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     surname = models.CharField(max_length=100)
@@ -25,9 +53,15 @@ class Author(models.Model):
     image = models.ImageField(upload_to=author_image_path, default= 'authors/images/default.png', blank=True, null=True)
 
     def __str__(self):
+        """
+        Returns a string representation of the author, which is the concatenation of the author's first and last name.
+        """
         return self.name + ' ' + self.surname
     
     def save(self, *args, **kwargs):
+        """
+        Overrides the default `save` method to update the image path with the author's id if the image name is None.
+        """
         # Save the instance to get the id assigned
         super().save(*args, **kwargs)
 
@@ -44,10 +78,12 @@ class Author(models.Model):
             super().save(*args, **kwargs)
     
     def delete(self, *args, **kwargs):
+        """
+        Overrides the default `delete` method to delete the image file associated with the Author instance.
+        """
         # Delete the image file associated with the Author instance
         self.image.delete(save=False)
         super().delete(*args, **kwargs)
-
     
     
 
@@ -64,17 +100,4 @@ class Posts(models.Model):
 
     def __str__(self):
         return self.title
-
-class User(models.Model):
-    id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=100)
-    name = models.CharField(max_length=100)
-    surname = models.CharField(max_length=100)
-    date_of_birth = models.DateField()
-    email = models.EmailField()
-    last_login = models.DateTimeField()
-    profile_image = models.ImageField(upload_to='users/images/', default='users/images/default.png')
-    bio = models.TextField()
-
-    def __str__(self):
-        return self.username
+    

@@ -1,15 +1,19 @@
 from django.contrib import admin
-from . models import Author, Posts, User
+from . models import Author, Posts
+
 
 # Register your models here.
 
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'date_posted','tags')
-    list_filter = ('author', 'date_posted','tags')
+    list_display = ('title', 'author', 'date','tags')
+    list_filter = ('author', 'date','tags')
     search_fields = ('title', 'content','tags')
     prepopulated_fields = {'slug': ('title',)}
-    date_hierarchy = 'date_posted'
+    date_hierarchy = 'date'
 
-admin.site.register(Author)
-admin.site.register(Posts)
-admin.site.register(User)
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = ('name', 'surname', 'email')
+    search_fields = ('name', 'surname', 'email')
+
+admin.site.register(Author, AuthorAdmin)
+admin.site.register(Posts, PostAdmin)
