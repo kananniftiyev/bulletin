@@ -28,10 +28,6 @@
                 <a class="text-muted" href="#">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-3"><circle cx="10.5" cy="10.5" r="7.5"></circle><line x1="21" y1="21" x2="15.8" y2="15.8"></line></svg>
                 </a>
-                {% if author_is_authenticated %}
-                <a class="btn btn-outline-secondary" href="#">Sign up</a>
-                {%endif%}
-                
               </div>
             </div>
         </header>
@@ -49,16 +45,16 @@
 
     <!--Trending-->
     <div class="container-sm trending-cont">
-        <img class="trending-img" src="{% static 'app_news/img/trending-img.jpg'%}" alt="">
+        <img class="trending-img" src="{{posts.main_image}}" alt="">
         <div class="trending-info">
             <div class="author-minute">
                 <img class="trending-user-img" src="{%static 'app_news/img/treding-user-logo.jpg'%}" alt="">
-                <p class="trend-user-name">Netflix</p> <!-- //TODO: Change to author name dynamically -->
+                <p class="trend-user-name">{{posts.author}}</p> <!-- //TODO: Change to author name dynamically -->
                 <span>•</span>
                 <p class="trend-minuteago">12 minutes ago</p> <!-- //TODO: Change to time dynamically -->
             </div>
-            <a class="timt-link" href=""><h1 class="timt">Where to watch 'John Wick: Chapter 4'</h1></a> <!-- TODO: Change to title dynamically -->
-            <p class="tid">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea.</p> <!-- //TODO: Change to content dynamically -->
+            <a class="timt-link" href=""><h1 class="timt">{{posts.title}}</h1></a> <!-- TODO: Change to title dynamically -->
+            <p class="tid">{{posts.excerpt}}</p> <!-- //TODO: Change to content dynamically -->
             <div class="category-time">
                 <p class="category">Movies</p>  <!-- // TODO: Change to category dynamically  -->
                 <span>•</span>

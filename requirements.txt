@@ -1,0 +1,4 @@
+django
+pillow
+psycopg2
+requests
