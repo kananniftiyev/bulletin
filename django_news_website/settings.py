@@ -89,13 +89,7 @@ DATABASES = {
     }
 }
 
-if 'test' in sys.argv:
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'django_news_website',
-        'USER': 'postgres',
-        'PASSWORD': 'kanan123',
-    }
+
 
 
 # Password validation

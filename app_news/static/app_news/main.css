@@ -139,6 +139,7 @@
 .latest-main{
     display: flex;
     flex-direction: row;
+    gap: 32px;
 }
 
 .latest-text{

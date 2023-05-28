@@ -49,14 +49,14 @@
         <div class="trending-info">
             <div class="author-minute">
                 <img class="trending-user-img" src="{%static 'app_news/img/treding-user-logo.jpg'%}" alt="">
-                <p class="trend-user-name">{{posts.author}}</p> <!-- //TODO: Change to author name dynamically -->
+                <p class="trend-user-name">{{posts.author}}</p>
                 <span>•</span>
-                <p class="trend-minuteago">12 minutes ago</p> <!-- //TODO: Change to time dynamically -->
+                <p class="trend-minuteago">{{posts.date}}</p> 
             </div>
-            <a class="timt-link" href=""><h1 class="timt">{{posts.title}}</h1></a> <!-- TODO: Change to title dynamically -->
-            <p class="tid">{{posts.excerpt}}</p> <!-- //TODO: Change to content dynamically -->
+            <a class="timt-link" href="{{posts.urlToPost}}"><h1 class="timt">{{posts.title}}</h1></a> 
+            <p class="tid">{{posts.excerpt}}</p>
             <div class="category-time">
-                <p class="category">Movies</p>  <!-- // TODO: Change to category dynamically  -->
+                <p class="category">{{posts.category}}</p>  <!-- // TODO: Change to category dynamically  -->
                 <span>•</span>
                 <p class="timeToRead">4 min read</p> <!-- // TODO: Change to time dynamically -->
             </div>
@@ -72,81 +72,10 @@
             </div>
             <div class="latest-main">
                 <!-- //TODO latest item will be apart from main.html and will be dynamic from database-->
-                <div class="latest-item">
-                    <img class="latest-main-img" src="{%static 'app_news/img/asd.jpg'%}" alt=""> 
-                    <div class="latest-author">
-                        <img src="{%static 'app_news/img/f1-logo.jpg'%}" alt="">
-                        <p>Formula 1</p>
-                        <span>•</span>
-                        <p>3 hours ago</p>
-                    </div>
-                    <div class="latest-item-texts">
-                        <a href=""><h6>'He deserves a lot more' Verstappen backs Alonso</h6></a>
-                        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Neque, iusto natus adipisci illo explicabo officiis temporibus blanditiis distinctio ea cum voluptates harum quis!</p>
-                    </div>
-                    <div class="latest-category">
-                        <p class="red">Sport</p>
-                        <span>•</span>
-                        <p class="lcp">8 min read</p>
-                    </div>
-                </div>
-
-                <div class="latest-item">
-                    <img class="latest-main-img" src="{%static 'app_news/img/asd.jpg'%}" alt="">
-                    <div class="latest-author">
-                        <img src="{%static 'app_news/img/f1-logo.jpg'%}" alt="">
-                        <p>Formula 1</p>
-                        <span>•</span>
-                        <p>3 hours ago</p>
-                    </div>
-                    <div class="latest-item-texts">
-                        <a href=""><h6>'He deserves a lot more' Verstappen backs Alonso</h6></a>
-                        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Neque, iusto natus adipisci illo explicabo officiis temporibus blanditiis distinctio ea cum voluptates harum quis!</p>
-                    </div>
-                    <div class="latest-category">
-                        <p class="red">Sport</p>
-                        <span>•</span>
-                        <p class="lcp" >8 min read</p>
-                    </div>
-                </div>
-
-                <div class="latest-item">
-                    <img class="latest-main-img" src="{%static 'app_news/img/asd.jpg'%}" alt="">
-                    <div class="latest-author">
-                        <img src="{%static 'app_news/img/f1-logo.jpg'%}" alt="">
-                        <p>Formula 1</p>
-                        <span>•</span>
-                        <p>3 hours ago</p>
-                    </div>
-                    <div class="latest-item-texts">
-                        <a href=""><h6>'He deserves a lot more' Verstappen backs Alonso</h6></a>
-                        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Neque, iusto natus adipisci illo explicabo officiis temporibus blanditiis distinctio ea cum voluptates harum quis!</p>
-                    </div>
-                    <div class="latest-category">
-                        <p class="red">Sport</p>
-                        <span>•</span>
-                        <p class="lcp">8 min read</p>
-                    </div>
-                </div>
-
-                <div class="latest-item">
-                    <img class="latest-main-img" src="{%static 'app_news/img/asd.jpg'%}" alt="">
-                    <div class="latest-author">
-                        <img src="{%static 'app_news/img/f1-logo.jpg'%}" alt="">
-                        <p>Formula 1</p>
-                        <span>•</span>
-                        <p>3 hours ago</p>
-                    </div>
-                    <div class="latest-item-texts">
-                        <a href=""><h6>'He deserves a lot more' Verstappen backs Alonso</h6></a>
-                        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Neque, iusto natus adipisci illo explicabo officiis temporibus blanditiis distinctio ea cum voluptates harum quis!</p>
-                    </div>
-                    <div class="latest-category">
-                        <p class="red">Sport</p>
-                        <span>•</span>
-                        <p class="lcp">8 min read</p>
-                    </div>
-                </div>
+                {% for post in latest  %}
+                {% include 'app_news/includes/post.html' %}
+                {% endfor %}
+               
             </div>
         </div>
     </section>

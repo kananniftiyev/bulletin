@@ -1,5 +1,5 @@
 from django.contrib import admin
-from . models import Posts
+from . models import TopPosts
 
 
 # Register your models here.
@@ -7,9 +7,8 @@ from . models import Posts
 class PostAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'date')
     list_filter = ('author', 'date')
-    search_fields = ('title', 'content')
-    prepopulated_fields = {'slug': ('title',)}
+    search_fields = ('title',)
     date_hierarchy = 'date'
 
 
-admin.site.register(Posts, PostAdmin)
+admin.site.register(TopPosts, PostAdmin)

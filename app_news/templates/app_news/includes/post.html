@@ -1,0 +1,23 @@
+{%load static%}
+<div class="latest-item">
+  <img class="latest-main-img" src="{{post.main_image}}" alt=""> 
+  <div class="latest-author">
+    {% if 'BBC' in post.author %}
+      <img src="{%static 'app_news/img/bbc.png'%}" alt="">
+      {% else %}
+      <img src="{%static 'app_news/img/no-img.webp'%}" alt="">
+      {% endif %}
+      <p>{{post.author}}</p>
+      <span>•</span>
+      <p>{{post.date}}</p>
+  </div>
+  <div class="latest-item-texts">
+      <a href="{{post.urlToPost}}"><h6>{{post.title}}</h6></a>
+      <p>{{post.excerpt}}</p>
+  </div>
+  <div class="latest-category">
+      <p class="red">Sport</p>
+      <span>•</span>
+      <p class="lcp">8 min read</p>
+  </div>
+</div>
