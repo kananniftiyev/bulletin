@@ -58,7 +58,7 @@
             <div class="category-time">
                 <p class="category">{{posts.category}}</p>  <!-- // TODO: Change to category dynamically  -->
                 <span>•</span>
-                <p class="timeToRead">4 min read</p> <!-- // TODO: Change to time dynamically -->
+                <p class="timeToRead">{{posts.timeToRead}} min read</p> <!-- // TODO: Change to time dynamically -->
             </div>
         </div>
     </div>
@@ -85,37 +85,17 @@
         <div class="container">
             <h1 class="latest-text">Top Creators</h1>
             <div class="creators">
-                <div class="creator-item">
-                    <img src="{%static 'app_news/img/creator-img.jpg'%}" alt="">
-                    <div class="creator-texts">
-                        <a href=""><h4>Alex Young</h4></a>
-                        <p>BBC News</p>
-                    </div>
-                </div>
 
+                {% for author in sorted_authors  %}
                 <div class="creator-item">
                     <img src="{%static 'app_news/img/creator-img.jpg'%}" alt="">
                     <div class="creator-texts">
-                        <a href=""><h4>Alex Young</h4></a>
+                        <a href=""><h4>{{author}}</h4></a>
                         <p>BBC News</p>
                     </div>
                 </div>
-
-                <div class="creator-item">
-                    <img src="{%static 'app_news/img/creator-img.jpg'%}" alt="">
-                    <div class="creator-texts">
-                        <a href=""><h4>Alex Young</h4></a>
-                        <p>BBC News</p>
-                    </div>
-                </div>
-
-                <div class="creator-item">
-                    <img src="{%static 'app_news/img/creator-img.jpg'%}" alt="">
-                    <div class="creator-texts">
-                        <a href=""><h4>Alex Young</h4></a>
-                        <p>BBC News</p>
-                    </div>
-                </div>
+                {% endfor %}
+            
             </div>
         </div>
 
@@ -133,43 +113,13 @@
 
                     <div class="b-bot">
 
-                    <div class="latest-item">
-                        <img class="latest-main-img" src="{%static 'app_news/img/asd.jpg'%}" alt=""> 
-                        <div class="latest-author">
-                            <img src="{%static 'app_news/img/f1-logo.jpg'%}" alt="">
-                            <p>Formula 1</p>
-                            <span>•</span>
-                            <p>3 hours ago</p>
-                        </div>
-                        <div class="latest-item-texts">
-                            <a href=""><h6 class="asd">'He deserves a lot more' Verstappen backs Alonso</h6></a>
-                        </div>
-                        <div class="latest-category">
-                            <p class="red">Sport</p>
-                            <span>•</span>
-                            <p class="lcp">8 min read</p>
-                        </div>
-                    </div>
+                        {% for post in business %}
+                        {% include 'app_news/includes/post.html' %}
+                        {% endfor %}
                     
-                    <div class="latest-item">
-                        <img class="latest-main-img" src="{%static 'app_news/img/asd.jpg'%}" alt=""> 
-                        <div class="latest-author">
-                            <img src="{%static 'app_news/img/f1-logo.jpg'%}" alt="">
-                            <p>Formula 1</p>
-                            <span>•</span>
-                            <p>3 hours ago</p>
-                        </div>
-                        <div class="latest-item-texts">
-                            <a href=""><h6 class="asd">'He deserves a lot more' Verstappen backs Alonso</h6></a>
-                        </div>
-                        <div class="latest-category">
-                            <p class="red">Sport</p>
-                            <span>•</span>
-                            <p class="lcp">8 min read</p>
-                        </div>
-                    </div>
+                    
 
-                </div>
+                    </div>
     
 
                 </div>
@@ -180,41 +130,11 @@
                     </div>
 
                     <div class="b-bot">
-                        <div class="latest-item">
-                            <img class="latest-main-img" src="{%static 'app_news/img/asd.jpg'%}" alt=""> 
-                            <div class="latest-author">
-                                <img src="{%static 'app_news/img/f1-logo.jpg'%}" alt="">
-                                <p>Formula 1</p>
-                                <span>•</span>
-                                <p>3 hours ago</p>
-                            </div>
-                            <div class="latest-item-texts">
-                                <a href=""><h6 class="asd">'He deserves a lot more' Verstappen backs Alonso</h6></a>
-                            </div>
-                            <div class="latest-category">
-                                <p class="red">Sport</p>
-                                <span>•</span>
-                                <p class="lcp">8 min read</p>
-                            </div>
-                        </div>
+                       
                         
-                        <div class="latest-item">
-                            <img class="latest-main-img" src="{%static 'app_news/img/asd.jpg'%}" alt=""> 
-                            <div class="latest-author">
-                                <img src="{%static 'app_news/img/f1-logo.jpg'%}" alt="">
-                                <p>Formula 1</p>
-                                <span>•</span>
-                                <p>3 hours ago</p>
-                            </div>
-                            <div class="latest-item-texts">
-                                <a href=""><h6 class="asd">'He deserves a lot more' Verstappen backs Alonso</h6></a>
-                            </div>
-                            <div class="latest-category">
-                                <p class="red">Sport</p>
-                                <span>•</span>
-                                <p class="lcp">8 min read</p>
-                            </div>
-                        </div>
+                        {% for post in sport %}
+                        {% include 'app_news/includes/post.html' %}
+                        {% endfor %}
                     </div>
     
                 </div>
