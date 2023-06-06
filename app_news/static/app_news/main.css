@@ -274,7 +274,7 @@
 .creators{
     display: flex;
     align-items: center;
-    margin-top: 32px;
+    margin-top: 42px;
     justify-content: space-between;
 }
     
@@ -328,4 +328,57 @@ footer{
 .subs:hover{
     background-color: #810f1a;
     border-color: #810f1a;
+}
+
+.subscribe-background{
+    margin-top: 54px;
+    margin-bottom: 54px;
+    background-color: #f6f6f6 !important;
+    border-radius: 20px;
+    padding: 52px;
+    padding-left: 52px !important;
+    padding-right: 52px !important;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.sub-left{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sub-right-form{
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+}
+
+.gfu-sm{
+    font-size: 16px;
+    font-weight: 600;
+    opacity: 0.5;
+    margin: 0;
+}
+
+.gfu-lg{
+    font-size: 32px;
+    font-weight: 700;
+    width: 60%;
+}
+
+.show{
+    display: none;
+    position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+}
+
+.messages-custom{
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
 }
