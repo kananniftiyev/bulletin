@@ -1,7 +1,6 @@
 from django.forms import ValidationError
-from django.urls import reverse
 from django.shortcuts import render
-from django.http import Http404, HttpResponseNotFound, HttpResponseServerError, HttpResponse, JsonResponse, HttpResponseRedirect
+from django.http import HttpResponseNotFound
 from django.core.validators import EmailValidator, ValidationError
 from django.views import View
 from .models import TopPosts, LatestPosts, Business, Sport, EmailList
@@ -13,6 +12,8 @@ from django.contrib import messages
 import re
 from math import ceil
 from .topic import TopicModel
+from django.core.paginator import Paginator
+
 
 
 
@@ -182,11 +183,23 @@ class IndexView(NewsApiMixin, View):
 #TODO: Finish class
 class SpecificCategoryView(View):
     template_name = 'app_news/allPage.html'
+    items_per_page = 30
 
     def get(self, request, model):
-        try:
-            identfyModel = apps.get_model('app_news', model)
-            return render(request, self.template_name, {'posts': identfyModel.objects.all()})
-        except:
-            HttpResponseNotFound('<h1>Page not found</h1>')
+        model_mapping = {
+            'sports': Sport,
+            'business': Business,
+            'latest': LatestPosts,
+        }
+
+        model_class = model_mapping.get(model)
+
+        if model_class:
+            queryset = model_class.objects.all().order_by('-pk')
+            paginator = Paginator(queryset, self.items_per_page)
+            posts = paginator.get_page(request.GET.get('page'))
+            return render(request, self.template_name, {'posts': posts, 'modelName': str(model_class.__name__)})
+        else:
+            return HttpResponseNotFound(f"Category '{model}' not found")
+        
 

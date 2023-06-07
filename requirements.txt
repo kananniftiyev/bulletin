@@ -3,3 +3,6 @@ pillow
 psycopg2
 requests
 newsapi-python
+nltk
+gensim
+django-widget-tweaks
