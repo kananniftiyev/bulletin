@@ -7,9 +7,7 @@ import re
 import string
 
 # Download stopwords and wordnet if not already downloaded
-nltk.download('stopwords')
-nltk.download('wordnet')
-nltk.download('punkt')  # Download the 'punkt' tokenizer
+# Download the 'punkt' tokenizer
 
 class TopicModel:
     def __init__(self):
