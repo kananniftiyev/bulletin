@@ -11,8 +11,11 @@ from .forms import EmailListForm
 from django.contrib import messages
 import re
 from math import ceil
-from .topic import TopicModel
 from django.core.paginator import Paginator
+from django.core.files import File
+import os
+from django.conf import settings
+
 
 
 
@@ -29,11 +32,40 @@ class NewsApiMixin:
     def get_everything(self, sources, language, sort_by):
         return self.newsapi.get_everything(sources=sources, language=language, sort_by=sort_by)
     
+class AuthorImageProecessor:
+    companies = {'BBC News': 'bbc.png',
+                'CNN' : 'cnn.png',
+                'CBS Sports' : 'cbs.png',
+                'Reuters' : 'reuters.png',
+                'The Times of India': 'toi.png',
+                'YouTube':'youtube.png',
+                'Hindustan Times':'ht.png',
+                'NDTV News':'ndtv.png',
+                'Daily Mail':'dm.png',
+                'ESPN':'espn.png',
+                'Financial Times':'ft.png',
+                'Yahoo Entertainment':'yahoo.png',
+                'Engadget':'Engadget_Logo.png',
+                'Google News':'google.png',
+                'Livemint':'livemint-logo.png'}
+
+    def getLogo(self, name):
+        if name in self.companies:
+            return self.companies[name]
+    
+    def getLogoFromModel(self, name):
+        folder_path = folder_path = os.path.join(os.path.join(settings.BASE_DIR, 'app_news', 'static', 'app_news', 'img'))
+        if name in self.companies:
+            image_path = os.path.join(folder_path, self.companies[name])
+            return File(open(image_path, 'rb'))
+        else:
+            return None
+
+    
     
 class ArticleProcessor:
     @staticmethod
     def process_and_save_articles(articles, model):
-        topicGetter = TopicModel()
         if 'articles' in articles:
             articles = articles['articles']
 
@@ -43,9 +75,10 @@ class ArticleProcessor:
                 source = article['source']['name'] or "No source available"
                 url_img = article['urlToImage'] or "https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png"
                 url = article['url']
-                category = topicGetter.getTopic(description, num_topics=1) or "No category available"
+                category = model.__name__ if model.__name__ in ('LatestPosts', 'TopPosts', 'Business', 'Sport') else None
                 textContent = str(article['content'])
                 timeToRead = ArticleProcessor.calcuate_read_time(textContent, 200)
+                #authorImg = AuthorImageProecessor().getLogoFromModel(source)
 
                 # Use get_or_create() to avoid creating duplicate posts
                 post, created = model.objects.get_or_create(
@@ -57,6 +90,7 @@ class ArticleProcessor:
                         'urlToPost': url,
                         'category': category,
                         'timeToRead': timeToRead,
+                        #'AuthorImg': authorImg
                     }
                 )
 
@@ -90,19 +124,7 @@ class ArticleProcessor:
         
         return ceil(minutes)
     
-class AuthorImageProecessor:
-    companies = {'BBC News': 'bbc.png',
-                'CNN' : 'cnn.png',
-                'CBS Sports' : 'cbs.png',
-                'Reuters' : 'reuters.png',
-                'The Times of India': 'toi.png',
-                'YouTube':'youtube.png',
-                'Hindustan Times':'ht.png',
-                'NDTV News':'ndtv.png',}
 
-    def getLogo(self, name):
-        if name in self.companies:
-            return self.companies[name]
 
 
 class IndexView(NewsApiMixin, View):
@@ -138,9 +160,12 @@ class IndexView(NewsApiMixin, View):
 
         form = EmailListForm()
 
+        # Get the author images
         authorImgProcess = AuthorImageProecessor()
         authorImg = [authorImgProcess.getLogo(author) for author in sorted_authors]
         author_and_img = zip(sorted_authors, authorImg)
+        
+
 
         context = {'posts': all_posts,
                    'latest': latest_posts, 
@@ -170,7 +195,7 @@ class IndexView(NewsApiMixin, View):
             else:
                 messages.warning(request, 'You are already subscribed to our newsletter!')
             
-            request.session['subscribed'] = True
+            #request.session['subscribed'] = True
             #return HttpResponseRedirect(reverse('success'))
         else:
             messages.error(request, 'Please enter a valid email address!')
@@ -180,8 +205,7 @@ class IndexView(NewsApiMixin, View):
 
 
 
-#TODO: Finish class
-class SpecificCategoryView(View):
+class SpecificCategoryView(NewsApiMixin,    View):
     template_name = 'app_news/allPage.html'
     items_per_page = 30
 
@@ -193,8 +217,19 @@ class SpecificCategoryView(View):
         }
 
         model_class = model_mapping.get(model)
+        latest_news = self.get_everything(sources='bbc-news', language='en', sort_by='publishedAt')
+        business_news = self.get_top_articles(category='business')
+        sport_news = self.get_top_articles(category='sports')
 
         if model_class:
+            
+            if model_class == LatestPosts:
+                ArticleProcessor.process_and_save_articles(latest_news, LatestPosts)
+            elif model_class ==  Sport:
+                ArticleProcessor.process_and_save_articles(sport_news, Sport)
+            elif model_class == Business:
+                ArticleProcessor.process_and_save_articles(business_news, Business)
+
             queryset = model_class.objects.all().order_by('-pk')
             paginator = Paginator(queryset, self.items_per_page)
             posts = paginator.get_page(request.GET.get('page'))

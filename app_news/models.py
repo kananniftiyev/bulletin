@@ -1,8 +1,12 @@
 from django.db import models
 import os
 from django.utils import timezone
-from django.utils.text import slugify
+import uuid
 
+def unique_filename(instance, filename):
+    ext = filename.split('.')[-1]
+    new_filename = f"{uuid.uuid4()}.{ext}"
+    return os.path.join('media/', new_filename)
 
 
 # Create your models here.
@@ -19,6 +23,10 @@ class TopPosts(models.Model):
     date = models.DateField(default=timezone.now)
     urlToPost = models.URLField(max_length=5000, null=True)
     timeToRead = models.IntegerField(default=0, null=True)
+    #AuthorImg = models.ImageField(null=True, default=None, blank=True)
+
+    def __name__(self):
+        return "TopPosts"
 
     def __str__(self):
         return self.title
@@ -35,8 +43,12 @@ class LatestPosts(models.Model):
     urlToPost = models.URLField(max_length=5000, null=True)
     timeToRead = models.IntegerField(default=0, null=True)
 
+    def __name__(self):
+        return "LatestPosts"
+
     def __str__(self):
         return self.title
+    
 
 class Business(models.Model):
     id = models.AutoField(primary_key=True)
@@ -48,6 +60,10 @@ class Business(models.Model):
     urlToPost = models.URLField(max_length=5000, null=True)
     category = models.CharField(max_length=100, default="Business", null=True)
     timeToRead = models.IntegerField(default=0, null=True)
+
+    def __name__(self):
+        return "Business"
+
 
     def __str__(self):
         return self.title
@@ -63,8 +79,12 @@ class Sport(models.Model):
     category = models.CharField(default="Sport", max_length=100, null=True)
     timeToRead = models.IntegerField(default=0, null=True)
 
+
     def __str__(self):
         return self.title
+    
+    def __name__(self):
+        return "Sport"
     
 class EmailList(models.Model):
     id = models.AutoField(primary_key=True)

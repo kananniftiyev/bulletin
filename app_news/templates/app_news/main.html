@@ -59,7 +59,9 @@
         <img class="trending-img" src="{{posts.main_image}}" alt="">
         <div class="trending-info">
             <div class="author-minute">
-                <img class="trending-user-img" src="{%static 'app_news/img/treding-user-logo.jpg'%}" alt="">
+                {% if posts.AuthorImg %}
+                <img class="trending-user-img" src="{{posts.AuthorImg.url}}" alt=""><!--TODO:Make it V2-->
+                {% endif %}
                 <p class="trend-user-name">{{posts.author}}</p>
                 <span>•</span>
                 <p class="trend-minuteago">{{posts.date}}</p> 
@@ -79,10 +81,10 @@
         <div class="container latest-news">
             <div class="latest-top">
                 <h1 class="latest-text">Latest News</h1>
-                <a class="latest-see-all" href="">See all &rarr;</a>
+                <a class="latest-see-all" href="/latest">See all &rarr;</a>
             </div>
             <div class="latest-main">
-                {% for post in latest  %}
+                {% for post in latest %}
                 {% include 'app_news/includes/post.html' %}
                 {% endfor %}
                
@@ -101,7 +103,6 @@
                     <img src="{% static 'app_news/img/'|add:img%}" alt="">
                     <div class="creator-texts">
                         <a href=""><h4>{{author}}</h4></a>
-                        <p>BBC News</p>
                     </div>
                 </div>
                 {% endfor %}
@@ -118,7 +119,7 @@
                 <div class="col">
                     <div class="b-top">
                         <h1>Business</h1>
-                        <a class="red" href="">➞</a>
+                        <a class="red" href="/business">➞</a>
                     </div>
 
                     <div class="b-bot">
@@ -136,7 +137,7 @@
                 <div class="col">
                     <div class="b-top">
                         <h1>Sport</h1> 
-                        <a class="red" href="">➞</a>
+                        <a class="red" href="/sports">➞</a>
                     </div>
 
                     <div class="b-bot">

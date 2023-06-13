@@ -2,11 +2,9 @@
 <div class="latest-item">
   <img class="latest-main-img" src="{{post.main_image}}" alt=""> 
   <div class="latest-author">
-    {% if 'BBC' in post.author %}
-      <img src="{%static 'app_news/img/bbc.png'%}" alt="">
-      {% else %}
-      <img src="{%static 'app_news/img/no-img.webp'%}" alt="">
-      {% endif %}
+    {% if post.AuthorImg %}
+    <img class="latest-author-img" src="{{post.AuthorImg.url}}" alt="">
+{% endif %}      
       <p>{{post.author}}</p>
       <span>•</span>
       <p>{{post.date}}</p>

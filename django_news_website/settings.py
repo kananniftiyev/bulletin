@@ -81,6 +81,14 @@ WSGI_APPLICATION = 'django_news_website.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+
+#Change the database settings according to your database
+#For example: If you are using MySQL then change the database settings as follows:
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.mysql',
+#        'NAME': 'django_news_website',
+#}
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -129,8 +137,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-MEDIA_URL = 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+#MEDIA_URL = 'media/'
+#MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # Default primary key field type
