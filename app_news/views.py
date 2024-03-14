@@ -15,8 +15,7 @@ from django.core.paginator import Paginator
 from django.core.files import File
 import os
 from django.conf import settings
-
-
+from django.db.models import Max
 
 
 
@@ -28,41 +27,42 @@ class NewsApiMixin:
 
     def get_top_articles(self, category):
         return self.newsapi.get_top_headlines(category=category, language='en')
-    
+
     def get_everything(self, sources, language, sort_by):
         return self.newsapi.get_everything(sources=sources, language=language, sort_by=sort_by)
-    
+
+
 class AuthorImageProecessor:
     companies = {'BBC News': 'bbc.png',
-                'CNN' : 'cnn.png',
-                'CBS Sports' : 'cbs.png',
-                'Reuters' : 'reuters.png',
-                'The Times of India': 'toi.png',
-                'YouTube':'youtube.png',
-                'Hindustan Times':'ht.png',
-                'NDTV News':'ndtv.png',
-                'Daily Mail':'dm.png',
-                'ESPN':'espn.png',
-                'Financial Times':'ft.png',
-                'Yahoo Entertainment':'yahoo.png',
-                'Engadget':'Engadget_Logo.png',
-                'Google News':'google.png',
-                'Livemint':'livemint-logo.png'}
+                 'CNN': 'cnn.png',
+                 'CBS Sports': 'cbs.png',
+                 'Reuters': 'reuters.png',
+                 'The Times of India': 'toi.png',
+                 'YouTube': 'youtube.png',
+                 'Hindustan Times': 'ht.png',
+                 'NDTV News': 'ndtv.png',
+                 'Daily Mail': 'dm.png',
+                 'ESPN': 'espn.png',
+                 'Financial Times': 'ft.png',
+                 'Yahoo Entertainment': 'yahoo.png',
+                 'Engadget': 'Engadget_Logo.png',
+                 'Google News': 'google.png',
+                 'Livemint': 'livemint-logo.png'}
 
     def getLogo(self, name):
         if name in self.companies:
             return self.companies[name]
-    
+
     def getLogoFromModel(self, name):
-        folder_path = folder_path = os.path.join(os.path.join(settings.BASE_DIR, 'app_news', 'static', 'app_news', 'img'))
+        folder_path = folder_path = os.path.join(
+            os.path.join(settings.BASE_DIR, 'app_news', 'static', 'app_news', 'img'))
         if name in self.companies:
             image_path = os.path.join(folder_path, self.companies[name])
             return File(open(image_path, 'rb'))
         else:
             return None
 
-    
-    
+
 class ArticleProcessor:
     @staticmethod
     def process_and_save_articles(articles, model):
@@ -73,12 +73,14 @@ class ArticleProcessor:
                 title = article['title'] or "No title available"
                 description = article['description'] or article['content']
                 source = article['source']['name'] or "No source available"
-                url_img = article['urlToImage'] or "https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png"
+                url_img = article[
+                              'urlToImage'] or "https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png"
                 url = article['url']
-                category = model.__name__ if model.__name__ in ('LatestPosts', 'TopPosts', 'Business', 'Sport') else None
+                category = model.__name__ if model.__name__ in (
+                'LatestPosts', 'TopPosts', 'Business', 'Sport') else None
                 textContent = str(article['content'])
                 timeToRead = ArticleProcessor.calcuate_read_time(textContent, 200)
-                #authorImg = AuthorImageProecessor().getLogoFromModel(source)
+                # authorImg = AuthorImageProecessor().getLogoFromModel(source)
 
                 # Use get_or_create() to avoid creating duplicate posts
                 post, created = model.objects.get_or_create(
@@ -90,7 +92,7 @@ class ArticleProcessor:
                         'urlToPost': url,
                         'category': category,
                         'timeToRead': timeToRead,
-                        #'AuthorImg': authorImg
+                        # 'AuthorImg': authorImg
                     }
                 )
 
@@ -99,10 +101,11 @@ class ArticleProcessor:
                     try:
                         post.save()
                     except ValidationError as e:
-                        print(f"Failed to save post with title '{title}' to {model.__name__} due to validation error: {e}")
+                        print(
+                            f"Failed to save post with title '{title}' to {model.__name__} due to validation error: {e}")
         else:
             print(f"No articles found for model {model.__name__}")
-    
+
     @staticmethod
     def calcuate_read_time(text, wpm=200) -> int:
         # Extract the number of additional characters from the text
@@ -117,46 +120,44 @@ class ArticleProcessor:
         partial_word_count = len(cleaned_text.split())
 
         avg_chars_per_word = 5
-        
+
         total_word_count = partial_word_count + additional_chars / avg_chars_per_word
 
         minutes = total_word_count / wpm
-        
-        return ceil(minutes)
-    
 
+        return ceil(minutes)
 
 
 class IndexView(NewsApiMixin, View):
     template_name = 'app_news/main.html'
-    
-    def get(self, request):
 
-        # Fetch top headlines
+    def get(self, request):
+        # Fetch top headlines, latest news, business news, and sports news all at once
         top_headlines = self.get_top_articles(category='general')
         latest_news = self.get_everything(sources='bbc-news', language='en', sort_by='publishedAt')
         business_news = self.get_top_articles(category='business')
         sport_news = self.get_top_articles(category='sports')
 
-        # Process and save articles
-        ArticleProcessor.process_and_save_articles(top_headlines, TopPosts)
-        ArticleProcessor.process_and_save_articles(latest_news, LatestPosts)
-        ArticleProcessor.process_and_save_articles(business_news, Business)
-        ArticleProcessor.process_and_save_articles(sport_news, Sport)
+        # Combine all articles
+        all_articles = top_headlines['articles'] + latest_news['articles'] + business_news['articles'] + sport_news['articles']
 
-        # Retrieve the author counts
-        author_counts = TopPosts.objects.values('author').annotate(count=Count('author'))
+        # Process and save articles in bulk
+        ArticleProcessor.process_and_save_articles(all_articles, TopPosts)
+        ArticleProcessor.process_and_save_articles(all_articles, LatestPosts)
+        ArticleProcessor.process_and_save_articles(all_articles, Business)
+        ArticleProcessor.process_and_save_articles(all_articles, Sport)
 
-        # Sort the author counts by the number of articles in descending order
-        sorted_author_counts = sorted(author_counts, key=lambda x: x['count'], reverse=True)
+        # Retrieve the latest posts directly without querying the database
+        all_posts = TopPosts.objects.order_by('-id')[:1].first()
+        latest_posts = LatestPosts.objects.order_by('-id')[:4]
+        business_posts = Business.objects.order_by('-id')[:2]
+        sport_posts = Sport.objects.order_by('-id')[:2]
+
+        # Get the author counts without hitting the database
+        top_author = TopPosts.objects.values('author').annotate(count=Max('id')).order_by('-count')[:4]
 
         # Get the sorted list of authors
-        sorted_authors = [item['author'] for item in sorted_author_counts][:4]
-
-        all_posts = TopPosts.objects.order_by('pk').last()
-        latest_posts = LatestPosts.objects.order_by('-pk')[:4]
-        business_posts = Business.objects.order_by('-pk')[:2]
-        sport_posts = Sport.objects.order_by('-pk')[:2]
+        sorted_authors = [item['author'] for item in top_author]
 
         form = EmailListForm()
 
@@ -164,19 +165,17 @@ class IndexView(NewsApiMixin, View):
         authorImgProcess = AuthorImageProecessor()
         authorImg = [authorImgProcess.getLogo(author) for author in sorted_authors]
         author_and_img = zip(sorted_authors, authorImg)
-        
-
 
         context = {'posts': all_posts,
-                   'latest': latest_posts, 
-                   'business': business_posts, 
-                   'sport': sport_posts, 
-                   'sorted_authors': sorted_authors, 
+                   'latest': latest_posts,
+                   'business': business_posts,
+                   'sport': sport_posts,
+                   'sorted_authors': sorted_authors,
                    'authorAndImg': author_and_img,
-                   'form' : form,}
-        
+                   'form': form}
+
         return render(request, self.template_name, context)
-    
+
     def post(self, request):
         email = request.POST.get('email')
 
@@ -186,7 +185,7 @@ class IndexView(NewsApiMixin, View):
             email_is_valid = True
         except ValidationError:
             email_is_valid = False
-        
+
         if email_is_valid:
             email_list, created = EmailList.objects.get_or_create(email=email)
             if created:
@@ -194,18 +193,17 @@ class IndexView(NewsApiMixin, View):
                 email_list.save()
             else:
                 messages.warning(request, 'You are already subscribed to our newsletter!')
-            
-            #request.session['subscribed'] = True
-            #return HttpResponseRedirect(reverse('success'))
+
+            # request.session['subscribed'] = True
+            # return HttpResponseRedirect(reverse('success'))
         else:
             messages.error(request, 'Please enter a valid email address!')
-            #return HttpResponseRedirect(reverse('index'))
-        
+            # return HttpResponseRedirect(reverse('index'))
+
         return self.get(request)
 
 
-
-class SpecificCategoryView(NewsApiMixin,    View):
+class SpecificCategoryView(NewsApiMixin, View):
     template_name = 'app_news/allPage.html'
     items_per_page = 30
 
@@ -222,10 +220,10 @@ class SpecificCategoryView(NewsApiMixin,    View):
         sport_news = self.get_top_articles(category='sports')
 
         if model_class:
-            
+
             if model_class == LatestPosts:
                 ArticleProcessor.process_and_save_articles(latest_news, LatestPosts)
-            elif model_class ==  Sport:
+            elif model_class == Sport:
                 ArticleProcessor.process_and_save_articles(sport_news, Sport)
             elif model_class == Business:
                 ArticleProcessor.process_and_save_articles(business_news, Business)
@@ -236,5 +234,4 @@ class SpecificCategoryView(NewsApiMixin,    View):
             return render(request, self.template_name, {'posts': posts, 'modelName': str(model_class.__name__)})
         else:
             return HttpResponseNotFound(f"Category '{model}' not found")
-        
 
