@@ -16,6 +16,8 @@ from django.core.files import File
 import os
 from django.conf import settings
 from django.db.models import Max
+from django.views.decorators.cache import cache_page
+
 
 
 
@@ -128,25 +130,13 @@ class ArticleProcessor:
         return ceil(minutes)
 
 
-class IndexView(NewsApiMixin, View):
+class IndexView(View):
     template_name = 'app_news/main.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        return cache_page(300, cache='default')(super().dispatch)(request, *args, **kwargs)
+
     def get(self, request):
-        # Fetch top headlines, latest news, business news, and sports news all at once
-        top_headlines = self.get_top_articles(category='general')
-        latest_news = self.get_everything(sources='bbc-news', language='en', sort_by='publishedAt')
-        business_news = self.get_top_articles(category='business')
-        sport_news = self.get_top_articles(category='sports')
-
-        # Combine all articles
-        all_articles = top_headlines['articles'] + latest_news['articles'] + business_news['articles'] + sport_news['articles']
-
-        # Process and save articles in bulk
-        ArticleProcessor.process_and_save_articles(all_articles, TopPosts)
-        ArticleProcessor.process_and_save_articles(all_articles, LatestPosts)
-        ArticleProcessor.process_and_save_articles(all_articles, Business)
-        ArticleProcessor.process_and_save_articles(all_articles, Sport)
-
         # Retrieve the latest posts directly without querying the database
         all_posts = TopPosts.objects.order_by('-id')[:1].first()
         latest_posts = LatestPosts.objects.order_by('-id')[:4]
@@ -203,7 +193,7 @@ class IndexView(NewsApiMixin, View):
         return self.get(request)
 
 
-class SpecificCategoryView(NewsApiMixin, View):
+class SpecificCategoryView(View):
     template_name = 'app_news/allPage.html'
     items_per_page = 30
 
@@ -215,19 +205,8 @@ class SpecificCategoryView(NewsApiMixin, View):
         }
 
         model_class = model_mapping.get(model)
-        latest_news = self.get_everything(sources='bbc-news', language='en', sort_by='publishedAt')
-        business_news = self.get_top_articles(category='business')
-        sport_news = self.get_top_articles(category='sports')
 
         if model_class:
-
-            if model_class == LatestPosts:
-                ArticleProcessor.process_and_save_articles(latest_news, LatestPosts)
-            elif model_class == Sport:
-                ArticleProcessor.process_and_save_articles(sport_news, Sport)
-            elif model_class == Business:
-                ArticleProcessor.process_and_save_articles(business_news, Business)
-
             queryset = model_class.objects.all().order_by('-pk')
             paginator = Paginator(queryset, self.items_per_page)
             posts = paginator.get_page(request.GET.get('page'))
