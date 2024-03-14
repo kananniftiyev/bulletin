@@ -4,10 +4,11 @@ psycopg2
 requests
 newsapi-python
 nltk
-gensim
 django-widget-tweaks
 django-redis
 celery
 django-debug-toolbar-template-timings
 django-debug-toolbar
 redis
+waitress
+async_timeout
